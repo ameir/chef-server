@@ -15,7 +15,7 @@ REBAR3 = rebar3
 endif
 
 all: $(REBAR3)
-	@$(REBAR3) do clean, compile, eunit, dialyzer
+	@$(REBAR3) do clean, compile, eunit, dialyzer, ct
 
 rel: all
 	@$(REBAR3) release
@@ -27,11 +27,12 @@ $(REBAR3):
 install: $(REBAR3) distclean
 	$(REBAR3) update
 
-travis: all ct rel
+travis:
+	@$(REBAR3) do clean, eunit, dialyzer, ct, release
 	@echo "Travis'd!"
 
 ct: $(REBAR3)
-	$(REBAR3) do ct --dir apps/chef_db/itest, ct --dir apps/oc_chef_authz/itest, ct --dir apps/oc_chef_wm/itest
+	$(REBAR3) ct
 
 version_clean:
 	@rm -f VERSION
