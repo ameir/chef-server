@@ -57,6 +57,14 @@ end_per_suite(Config) ->
     {ok, 1} = sqerl:execute(<<"DELETE FROM users WHERE username = $1">>, [?USER_NAME]),
     setup_helper:base_end_per_suite(Config).
 
+init_per_testcase(_, Config) ->
+    setup_helper:mock_authz(?CLIENT_AUTHZ_ID),
+    Config.
+
+end_per_testcase(_, Config) ->
+    setup_helper:unmock_authz(),
+    Config.
+
 endpoint_gives_valid_response(_Config) ->
     {Code, EJ} = api_get("server_api_version", ?API_MIN_VER),
     ?assertEqual(Code, "200"),

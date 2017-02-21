@@ -97,6 +97,8 @@ start_server(Config) ->
                          {ibrowse_options, [{connect_timeout, 10000}]},
                          {timeout, 300}
                         ]),
+    meck:new(darklaunch_app),
+    meck:expect(darklaunch_app, start, fun(_, _) -> {ok, self()} end),
     [ {ok, _} = application:ensure_all_started(A) || A <- needed_apps() ],
     Config.
 
@@ -226,6 +228,11 @@ mock_authz(ClientAuthzId) ->
     meck:expect(oc_chef_authz, is_authorized_on_resource,
                 fun(_, _, _, _, _, _) ->
                         ct:pal("is_authorized_on_resource()~n", []),
+                        true
+                end),
+    meck:expect(oc_chef_authz, is_actor_transitive_member_of_group,
+                fun(_, _, _) ->
+                        ct:pal(" is_actor_transitive_member_of_group()~n", []),
                         true
                 end),
 
